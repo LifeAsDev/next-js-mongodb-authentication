@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
-
+  const router = useRouter();
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     let newErrors: string[] = [];
@@ -27,21 +28,30 @@ export default function Home() {
     }*/
 
     setErrors((arr) => [...newErrors]);
-
     if (newErrors.length > 0) {
       return;
     }
+
     try {
       const res = await fetch("api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
+
       if (res.ok) {
-        setName("");
-        setPassword("");
-        setEmail("");
+        const { message } = await res.json();
+        if (message === "User registered") {
+          setName("");
+          setEmail("");
+          setPassword("");
+          router.push("/");
+        } else {
+          setErrors([message]);
+        }
       } else {
+        const { message } = await res.json();
+        console.log(message);
         console.log("failed registration");
       }
     } catch (error) {
@@ -57,22 +67,36 @@ export default function Home() {
       >
         <input
           value={name}
-          onChange={(e) => setName(e.target.value.replace(" ", ""))}
+          onChange={(e) => {
+            setName(e.target.value.replace(" ", ""));
+            setErrors([]);
+          }}
           className={`pb-3 outline-0 border-b-2  ${
-            errors.includes("name required") ? "border-red-500" : ""
+            errors.includes("name required") ||
+            errors.includes("Username already in use")
+              ? "border-red-500"
+              : ""
           }`}
           type="text"
           placeholder="Username"
         ></input>
         <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
-          {errors.includes("name required") ? "Field required" : null}
+          {errors.includes("name required")
+            ? "Field required"
+            : errors.includes("Username already in use")
+            ? "Username already in use"
+            : null}
         </p>
         <input
           value={email}
-          onChange={(e) => setEmail(e.target.value.replace(" ", ""))}
+          onChange={(e) => {
+            setEmail(e.target.value.replace(" ", ""));
+            setErrors([]);
+          }}
           className={`pb-3 outline-0  border-b-2  ${
             errors.includes("email required") ||
-            errors.includes("email invalid")
+            errors.includes("email invalid") ||
+            errors.includes("Email already in use")
               ? "border-red-500"
               : ""
           }`}
@@ -84,11 +108,16 @@ export default function Home() {
             ? "Field required"
             : errors.includes("email invalid")
             ? "Email invalid"
+            : errors.includes("Email already in use")
+            ? "Email already in use"
             : null}
         </p>
         <input
           value={password}
-          onChange={(e) => setPassword(e.target.value.replace(" ", ""))}
+          onChange={(e) => {
+            setPassword(e.target.value.replace(" ", ""));
+            setErrors([]);
+          }}
           className={`pb-3 outline-0  border-b-2  ${
             errors.includes("pass required") ? "border-red-500" : ""
           }`}
