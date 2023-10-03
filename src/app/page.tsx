@@ -2,16 +2,22 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
+  const router = useRouter();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
       <h2 className="text-[2rem]	font-extrabold	">Welcome</h2>
-      <form className="flex flex-col gap-0.5 min-w-[25rem]">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-0.5 min-w-[25rem]"
+      >
         <input
           onChange={(e) => setName(e.target.value)}
           className="pb-4 outline-0 border-b-2 "

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import axios from "axios";
 export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -31,32 +31,12 @@ export default function Home() {
     if (newErrors.length > 0) {
       return;
     }
-
     try {
-      const res = await fetch("api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      if (res.ok) {
-        const { message } = await res.json();
-        if (message === "User registered") {
-          setName("");
-          setEmail("");
-          setPassword("");
-          router.push("/");
-        } else {
-          setErrors([message]);
-        }
-      } else {
-        const { message } = await res.json();
-        console.log(message);
-        console.log("failed registration");
-      }
-    } catch (error) {
-      console.log("error during registration: ", error);
-    }
+      const apiRes = await axios.post(
+        "api/register",
+        JSON.stringify({ name, email, password })
+      );
+    } catch (error) {}
   };
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
