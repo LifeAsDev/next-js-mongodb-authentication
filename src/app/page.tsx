@@ -3,14 +3,22 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { signIn } from "next-auth/react";
 export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const router = useRouter();
-
+  const handleSubmit = async () => {
+    const res: any = signIn("credentials", {
+      name,
+      password,
+      redirect: false,
+      callbackUrl: `${window.location.origin}`,
+    });
+    !res.error ? console.log("BIEN") : null;
+  };
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
       <h2 className="text-[2rem]	font-extrabold	">Welcome</h2>

@@ -32,11 +32,14 @@ export default function Home() {
       return;
     }
     try {
-      const apiRes = await axios.post(
-        "api/register",
-        JSON.stringify({ name, email, password })
-      );
-    } catch (error) {}
+      const res = await fetch("api/register", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+    } catch (error) {
+      console.log("error");
+    }
   };
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
