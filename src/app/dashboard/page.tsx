@@ -1,5 +1,5 @@
 "use client";
-
+import { NextAuthProvider } from "../Providers";
 import { useSession } from "next-auth/react";
 export default function Home() {
   const { data: session } = useSession();
@@ -10,7 +10,8 @@ export default function Home() {
       {session ? (
         <>
           <p>
-            Signed in as {session?.user?.name} <br />
+            Signed in as{" "}
+            <span className="font-bold	">{session?.user?.name}</span> <br />
           </p>
         </>
       ) : (
