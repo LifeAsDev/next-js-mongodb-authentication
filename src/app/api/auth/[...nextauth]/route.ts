@@ -25,7 +25,8 @@ const handler = NextAuth({
         try {
           const user = await User.findOne({ name: credentials?.name });
 
-          if (await compare(credentials!.password, user.hashedPassword)) {
+          if (await compare(credentials!.password, user.password)) {
+            console.log("sesion iniciada");
             return user;
           } else {
             throw new Error("Invalid Password");

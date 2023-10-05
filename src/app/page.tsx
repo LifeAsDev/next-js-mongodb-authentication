@@ -10,14 +10,18 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const router = useRouter();
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     const res: any = signIn("credentials", {
       name,
       password,
       redirect: false,
       callbackUrl: `${window.location.origin}`,
     });
-    !res.error ? console.log("BIEN") : null;
+    if (!res.error) {
+      console.log("BIEN");
+      router.push("/dashboard");
+    }
   };
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
