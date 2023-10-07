@@ -23,7 +23,18 @@ export async function POST(req: {
 
   if (userExist || userExist1) {
     console.log("user existed");
-    return NextResponse.json({ message: "user existed" }, { status: 201 });
+    if (userExist) {
+      return NextResponse.json(
+        { message: "Username already in use" },
+        { status: 201 }
+      );
+    }
+    if (userExist1) {
+      return NextResponse.json(
+        { message: "Email already in use" },
+        { status: 201 }
+      );
+    }
   } else {
     console.log("user created");
     User.create({ name, email, password: hashedPassword });

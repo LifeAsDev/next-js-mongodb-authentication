@@ -31,14 +31,14 @@ export default function Home() {
         className="flex flex-col gap-0.5 min-w-[25rem]"
       >
         <input
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value.replace(" ", ""))}
           className="pb-4 outline-0 border-b-2 "
           type="text"
           placeholder="Username"
         ></input>
         <p className="min-h-[2rem] text-red-500 font-medium flex items-center"></p>
         <input
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value.replace(" ", ""))}
           className="pb-4 outline-0 border-b-2"
           type="password"
           placeholder="Password"

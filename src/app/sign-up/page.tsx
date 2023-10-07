@@ -9,11 +9,13 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const handleSubmit = async (e: { preventDefault: () => void }) => {
+    setLoading(true);
     e.preventDefault();
     let newErrors: string[] = [];
-    /* if (name === "") {
+    if (name === "") {
       newErrors.push("name required");
     }
     if (email === "") {
@@ -25,11 +27,11 @@ export default function Home() {
     }
     if (password === "") {
       newErrors.push("pass required");
-    }*/
+    }
 
     setErrors((arr) => [...newErrors]);
     if (newErrors.length > 0) {
-      return;
+      return setLoading(false);
     }
     try {
       const res = await fetch("api/register", {
@@ -37,7 +39,13 @@ export default function Home() {
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
+      if (res.ok) {
+        const data = await res.json();
+        data.message !== "user created" ? setErrors([data.message]) : null;
+        setLoading(false);
+      }
     } catch (error) {
+      setLoading(false);
       console.log("error");
     }
   };
@@ -49,6 +57,7 @@ export default function Home() {
         className="flex flex-col gap-0.5 min-w-[25rem]"
       >
         <input
+          onBlur={() => setErrors([])}
           value={name}
           onChange={(e) => {
             setName(e.target.value.replace(" ", ""));
@@ -71,6 +80,7 @@ export default function Home() {
             : null}
         </p>
         <input
+          onBlur={() => setErrors([])}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value.replace(" ", ""));
@@ -96,6 +106,7 @@ export default function Home() {
             : null}
         </p>
         <input
+          onBlur={() => setErrors([])}
           value={password}
           onChange={(e) => {
             setPassword(e.target.value.replace(" ", ""));
@@ -110,8 +121,13 @@ export default function Home() {
         <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
           {errors.includes("pass required") ? "Field required" : null}
         </p>
-        <button className="shadow-e box-border mt-3 h-[52px] text-white	rounded-[50px] bg-green p-[.5rem]">
-          REGISTER
+        <button
+          disabled={loading}
+          className={`flex justify-center items-center shadow-e box-border mt-3 h-[52px] text-white rounded-[50px] bg-green p-[.5rem] ${
+            loading ? "saturate-50" : ""
+          }`}
+        >
+          {!loading ? "REGISTER" : <div className="loader"></div>}
         </button>
         <Link className="mt-10" href={"/"}>
           Already have an account? <span className="text-green">Login</span>
