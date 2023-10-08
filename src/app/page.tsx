@@ -10,7 +10,6 @@ export default function Home() {
   const { data: session } = useSession();
   useEffect(() => {
     if (session) {
-      console.log("session = true");
       router.push("/dashboard");
     }
   }, [router, session]);
