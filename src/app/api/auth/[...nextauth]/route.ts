@@ -22,18 +22,17 @@ const handler = NextAuth({
 
       async authorize(credentials) {
         await connectMongoDB();
-        try {
-          const user = await User.findOne({ name: credentials?.name });
-
-          if (await compare(credentials!.password, user.password)) {
-            console.log("sesion iniciada");
-            return user;
-          } else {
-            throw new Error("Invalid Password");
-          }
-        } catch (error) {
-          console.log(error);
+        const user = await User.findOne({ name: credentials?.name });
+        if (!user) {
+          console.log("Invalid Username");
           throw new Error("Invalid Username");
+        }
+        if (await compare(credentials!.password, user.password)) {
+          console.log("sesion iniciada");
+          return user;
+        } else {
+          console.log("Invalid Password");
+          throw new Error("Invalid Password");
         }
       },
     }),

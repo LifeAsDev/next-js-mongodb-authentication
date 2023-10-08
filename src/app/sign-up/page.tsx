@@ -3,13 +3,16 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useSession } from "next-auth/react";
+
 export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
+
   const router = useRouter();
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     setLoading(true);
@@ -41,7 +44,10 @@ export default function Home() {
       });
       if (res.ok) {
         const data = await res.json();
-        data.message !== "user created" ? setErrors([data.message]) : null;
+        data.message !== "user created"
+          ? setErrors([data.message])
+          : router.push("/");
+
         setLoading(false);
       }
     } catch (error) {

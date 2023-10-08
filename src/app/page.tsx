@@ -1,26 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 export default function Home() {
+  const router = useRouter();
+
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (session) {
+      console.log("session = true");
+      router.push("/dashboard");
+    }
+  }, [router, session]);
+
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e: { preventDefault: () => void }) => {
+    setLoading(true);
     e.preventDefault();
-    const res: any = signIn("credentials", {
+    let newErrors: string[] = [];
+    if (name === "") {
+      newErrors.push("name required");
+    }
+
+    if (password === "") {
+      newErrors.push("pass required");
+    }
+
+    setErrors((arr) => [...newErrors]);
+    if (newErrors.length > 0) {
+      return setLoading(false);
+    }
+
+    const res: any = await signIn("credentials", {
       name,
       password,
       redirect: false,
       callbackUrl: `${window.location.origin}`,
     });
+
     if (!res.error) {
-      console.log("BIEN");
+      setLoading(false);
       router.push("/dashboard");
+    } else {
+      setErrors(["wrong credentials"]);
+      setLoading(false);
     }
   };
   return (
@@ -31,23 +60,58 @@ export default function Home() {
         className="flex flex-col gap-0.5 min-w-[25rem]"
       >
         <input
-          onChange={(e) => setName(e.target.value.replace(" ", ""))}
-          className="pb-4 outline-0 border-b-2 "
+          onBlur={() => setErrors([])}
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value.replace(" ", ""));
+            setErrors([]);
+          }}
+          className={`pb-3 outline-0 border-b-2  ${
+            errors.includes("name required") ||
+            errors.includes("wrong credentials")
+              ? "border-red-500"
+              : ""
+          }`}
           type="text"
           placeholder="Username"
         ></input>
-        <p className="min-h-[2rem] text-red-500 font-medium flex items-center"></p>
+        <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
+          {errors.includes("name required")
+            ? "Field required"
+            : errors.includes("wrong credentials")
+            ? "Incorrect Username"
+            : null}
+        </p>
         <input
-          onChange={(e) => setPassword(e.target.value.replace(" ", ""))}
-          className="pb-4 outline-0 border-b-2"
+          onBlur={() => setErrors([])}
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value.replace(" ", ""));
+            setErrors([]);
+          }}
+          className={`pb-3 outline-0  border-b-2  ${
+            errors.includes("pass required") ||
+            errors.includes("wrong credentials")
+              ? "border-red-500"
+              : null
+          }`}
           type="password"
           placeholder="Password"
         ></input>
-        <p className="min-h-[2rem] text-red-500 font-medium flex items-center">
-          {" "}
+        <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
+          {errors.includes("pass required")
+            ? "Field required"
+            : errors.includes("wrong credentials")
+            ? "Incorrect Password"
+            : null}
         </p>
-        <button className="shadow-e box-border mt-3 h-[52px] text-white	rounded-[50px] bg-green p-[.5rem]">
-          LOGIN
+        <button
+          disabled={loading}
+          className={`flex justify-center items-center shadow-e box-border mt-3 h-[52px] text-white rounded-[50px] bg-green p-[.5rem] ${
+            loading ? "saturate-50" : ""
+          }`}
+        >
+          {!loading ? "LOGIN" : <div className="loader"></div>}
         </button>
         <Link className="mt-10" href={"/sign-up"}>
           Don't have an account? <span className="text-green">Sign up</span>
