@@ -1,7 +1,5 @@
 "use client";
-
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
@@ -71,19 +69,16 @@ export default function Home() {
       }
     );
   };
-  const { data: session } = useSession();
-  const router = useRouter();
+  const { data: session, status } = useSession();
+  if (status === "loading") {
+    return <p> </p>;
+  }
 
-  useEffect(() => {
-    if (!session) {
-      router.push("/");
-    }
-  }, [router, session]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 gap-4">
       <h2 className="text-[2rem]	font-extrabold	">DASHBOARD</h2>
       {session ? (
-        <div className="border w-full  md:w-[500px]  flex border-gray-300 items-center rounded-lg p-4 flex-col justify-center gap-4  mt-8 mg:mt-10">
+        <div className="border w-full  md:w-[500px]  flex border-gray-300 items-center rounded-lg p-4 flex-col justify-center gap-4  mt-4 mg:mt-10">
           <div className="w-full pb-3 flex flex-row	gap-4 items-center 	border-b-[1px] border-gray-300 w-full">
             <UserIcon />
             <input
@@ -146,15 +141,23 @@ export default function Home() {
               className="inputfile"
               type="file"
             ></input>
-            <button
-              type="submit"
-              disabled={false}
-              className={`outline-none flex justify-center items-center shadow-e box-border mt-3 h-[52px] text-white rounded-[50px] bg-green p-[.5rem] ${
-                false ? "saturate-50" : ""
-              }`}
-            >
-              SAVE
-            </button>
+            <div className="gap-4 flex flex-row w-full">
+              <button
+                type="submit"
+                disabled={false}
+                className={`w-[70%] outline-none flex justify-center items-center shadow-e box-border mt-3 h-[48px] text-white rounded-[50px] bg-green p-[.5rem] ${
+                  false ? "saturate-50" : ""
+                }`}
+              >
+                SAVE
+              </button>
+              <button
+                onClick={() => signOut()}
+                className={`w-[30%] outline-none flex justify-center items-center shadow-red box-border mt-3 h-[48px] text-white rounded-[50px] bg-red-500 p-[.5rem]`}
+              >
+                SIGN OUT
+              </button>
+            </div>
           </form>
         </div>
       ) : (
