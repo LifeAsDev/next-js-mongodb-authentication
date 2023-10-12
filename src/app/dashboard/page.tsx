@@ -11,15 +11,13 @@ import DeleteIcon from "../components/deleteSVG";
 export default function Home() {
   const [phone, setPhone] = useState("");
   const [imgURL, setimgURL] = useState("");
-  const [loadingImg, setLoadingImg] = useState(0);
+  const [loadingImg, setLoadingImg] = useState(100);
   const [selectedImage, setSelectedImage] = useState();
 
   // This function will be triggered when the file field change
   const imageChange = (e: any) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedImage(e.target.files[0]);
-    } else {
-      console.log("NOOOOOOOOOOOOOO");
     }
   };
 
@@ -42,8 +40,34 @@ export default function Home() {
     const validatedValue = e.target.value.replace(/[^0-9]/g, "");
     setPhone(validatedValue);
   };
+  const updateOnMongoDB = async () => {
+    try {
+      console.log("Updating on mongoDB Boss");
+      const res = await fetch("api/update", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          name: session?.user?.name,
+          phone: "555555555",
+          imageUrl: imgURL,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        console.log("Updated on mongoDB Boss");
 
+        console.log(data.message);
+      }
+      setLoadingImg(100);
+    } catch (error) {
+      setLoadingImg(100);
+
+      console.log("error");
+    }
+  };
   const handleUpload = (e: { [x: string]: any; preventDefault: any }) => {
+    setLoadingImg(0);
+    console.log("uploading to firebase boss");
     e.preventDefault();
     const file = e.target[0]?.files[0];
     if (!file) return;
@@ -54,8 +78,6 @@ export default function Home() {
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setLoadingImg(progress);
-        progress >= 99 ? console.log("ya") : null;
       },
       (error) => {
         alert(error);
@@ -64,6 +86,10 @@ export default function Home() {
         getDownloadURL(uploadTask.snapshot.ref).then(
           (url: SetStateAction<string>) => {
             setimgURL(url);
+            console.log("uploaded to firebase boss");
+            console.log(url);
+
+            updateOnMongoDB();
           }
         );
       }
@@ -144,12 +170,14 @@ export default function Home() {
             <div className="gap-4 flex flex-row w-full">
               <button
                 type="submit"
-                disabled={false}
+                disabled={!selectedImage}
                 className={`w-[70%] outline-none flex justify-center items-center shadow-e box-border mt-3 h-[48px] text-white rounded-[50px] bg-green p-[.5rem] ${
-                  false ? "saturate-50" : ""
+                  !selectedImage || loadingImg < 99
+                    ? "saturate-[.5] cursor-not-allowed	  "
+                    : ""
                 }`}
               >
-                SAVE
+                {loadingImg > 99 ? "SAVE" : <div className="loader"></div>}
               </button>
               <button
                 onClick={() => signOut()}
@@ -161,9 +189,7 @@ export default function Home() {
           </form>
         </div>
       ) : (
-        <p>
-          Not signed in <br />
-        </p>
+        <p></p>
       )}
     </main>
   );
