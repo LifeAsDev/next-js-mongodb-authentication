@@ -22,7 +22,11 @@ const handler = NextAuth({
 
       async authorize(credentials) {
         await connectMongoDB();
-        const user = await User.findOne({ name: credentials?.name });
+        const user = await User.findOne({
+          name: {
+            $regex: new RegExp(credentials?.name || "", "i"),
+          },
+        });
         if (!user) {
           console.log("Invalid Username");
           throw new Error("Invalid Username");

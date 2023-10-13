@@ -18,29 +18,27 @@ export default function Home() {
   const imageChange = (e: any) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedImage(e.target.files[0]);
-    }
-  };
-
-  const remove_selected = (id_input: any) => {
-    let fileInput = document.getElementById(id_input);
-
-    if (fileInput instanceof HTMLInputElement) {
-      fileInput.value = "";
-      fileInput.dispatchEvent(new Event("change"));
+      setimgURL(URL.createObjectURL(e.target.files[0]));
     }
   };
 
   // This function will be triggered when the "Remove This Image" button is clicked
   const removeSelectedImage = () => {
-    remove_selected("file");
+    let fileInput = document.getElementById("file");
 
+    if (fileInput instanceof HTMLInputElement) {
+      fileInput.value = "";
+      fileInput.dispatchEvent(new Event("change"));
+    }
+    setimgURL("");
     setSelectedImage(undefined);
   };
+
   const numberHandler = (e: any) => {
     const validatedValue = e.target.value.replace(/[^0-9]/g, "");
     setPhone(validatedValue);
   };
-  const updateOnMongoDB = async () => {
+  const updateOnMongoDB = async (url: SetStateAction<string>) => {
     try {
       console.log("Updating on mongoDB Boss");
       const res = await fetch("api/update", {
@@ -48,13 +46,16 @@ export default function Home() {
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
           name: session?.user?.name,
-          phone: "555555555",
-          imageUrl: imgURL,
+          phone,
+          imageUrl: url,
         }),
       });
       if (res.ok) {
         const data = await res.json();
         console.log("Updated on mongoDB Boss");
+        data.message === "Users update"
+          ? setSelectedImage(data.imageUrl)
+          : null;
 
         console.log(data.message);
       }
@@ -65,12 +66,34 @@ export default function Home() {
       console.log("error");
     }
   };
+
+  const getUserData = async () => {
+    try {
+      const res = await fetch("api/check", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          name: session?.user?.name,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.message === "Users get") {
+          setimgURL(data.imageUrl);
+          setPhone(data.phone);
+        }
+      }
+    } catch (error) {
+      console.log("error");
+    }
+  };
+
   const handleUpload = (e: { [x: string]: any; preventDefault: any }) => {
     setLoadingImg(0);
     console.log("uploading to firebase boss");
     e.preventDefault();
     const file = e.target[0]?.files[0];
-    if (!file) return;
+    if (!file) return updateOnMongoDB(imgURL);
     const storageRef = ref(storage, `images/${session?.user?.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
     uploadTask.on(
@@ -85,17 +108,24 @@ export default function Home() {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then(
           (url: SetStateAction<string>) => {
-            setimgURL(url);
             console.log("uploaded to firebase boss");
-            console.log(url);
 
-            updateOnMongoDB();
+            setimgURL(url);
+            updateOnMongoDB(url);
+
+            console.log(url);
           }
         );
       }
     );
   };
+
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    status !== "loading" ? getUserData() : null;
+  }, [status]);
+
   if (status === "loading") {
     return <p> </p>;
   }
@@ -104,7 +134,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-4 gap-4">
       <h2 className="text-[2rem]	font-extrabold	">DASHBOARD</h2>
       {session ? (
-        <div className="border w-full  md:w-[500px]  flex border-gray-300 items-center rounded-lg p-4 flex-col justify-center gap-4  mt-4 mg:mt-10">
+        <div className="border w-full  md:w-[500px]  flex border-gray-300 items-center rounded-lg p-4 pb-6 flex-col justify-center gap-4  mt-4 mg:mt-10">
           <div className="w-full pb-3 flex flex-row	gap-4 items-center 	border-b-[1px] border-gray-300 w-full">
             <UserIcon />
             <input
@@ -128,12 +158,12 @@ export default function Home() {
             className="flex flex-col w-full h-[350px]"
             onSubmit={handleUpload}
           >
-            {selectedImage ? (
-              <div className="flex flex-col justify-center items-center border-dotted border-2 w-full h-[300px] ">
+            {imgURL !== "" ? (
+              <div className="flex flex-col justify-center items-center border-dotted border-2 w-full min-h-[300px] ">
                 <div className="relative h-full">
                   <img
                     className="w-full h-full object-cover"
-                    src={URL.createObjectURL(selectedImage)}
+                    src={imgURL}
                     alt="Thumb"
                   />
                 </div>
@@ -148,8 +178,8 @@ export default function Home() {
               </div>
             ) : (
               <label
-                className={`flex flex-col justify-center items-center border-dotted border-2 w-full h-[300px] ${
-                  selectedImage ? "" : "cursor-pointer"
+                className={`flex flex-col justify-center items-center border-dotted border-2 w-full min-h-[300px] ${
+                  imgURL !== "" ? "" : "cursor-pointer"
                 }`}
                 htmlFor="file"
               >
@@ -170,10 +200,10 @@ export default function Home() {
             <div className="gap-4 flex flex-row w-full">
               <button
                 type="submit"
-                disabled={!selectedImage}
+                disabled={imgURL === ""}
                 className={`w-[70%] outline-none flex justify-center items-center shadow-e box-border mt-3 h-[48px] text-white rounded-[50px] bg-green p-[.5rem] ${
-                  !selectedImage || loadingImg < 99
-                    ? "saturate-[.5] cursor-not-allowed	  "
+                  imgURL === "" || loadingImg < 99
+                    ? "saturate-[.3] cursor-not-allowed	  "
                     : ""
                 }`}
               >
