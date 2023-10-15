@@ -14,9 +14,7 @@ export async function POST(req: {
   await connectMongoDB();
   const data = await User.findOneAndUpdate(
     {
-      email: {
-        $regex: new RegExp(email || "", "i"),
-      },
+      email: new RegExp(`^${email}$`, "i"),
     },
     { phone, imageUrl },
     { new: true }

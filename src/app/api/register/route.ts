@@ -21,21 +21,15 @@ export async function POST(req: {
 
   if (name) {
     userExist = await User.findOne({
-      name: {
-        $regex: new RegExp(name || "", "i"),
-      },
+      name: new RegExp(`^${name}$`, "i"),
     }).select("name");
   } else {
     name = "";
   }
 
   const userExist1 = await User.findOne({
-    email: {
-      $regex: new RegExp(email || "", "i"),
-    },
+    email: new RegExp(`^${email}$`, "i"),
   }).select("email");
-
-  console.log({ name, email, password });
 
   if (userExist || userExist1) {
     console.log("user existed");

@@ -33,16 +33,16 @@ const handler = NextAuth({
         const user =
           credentials?.name !== " "
             ? await User.findOne({
-                name: {
-                  $regex: new RegExp(credentials?.name || "", "i"),
-                },
+                name: new RegExp(`^${credentials?.name}$`, "i"),
               })
             : null;
-
         if (!user) {
           console.log("Invalid Username");
           throw new Error("Invalid Username");
         }
+        console.log(credentials?.email);
+        console.log(user);
+
         if (
           user.password !== " " &&
           (await compare(credentials!.password, user.password))
@@ -58,6 +58,7 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account }) {
+      console.log(account?.provider);
       if (account?.provider === "google") {
         const { email } = user;
 

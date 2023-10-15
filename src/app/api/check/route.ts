@@ -10,19 +10,23 @@ export async function POST(req: {
 
   await connectMongoDB();
   const data = await User.findOne({ email });
-  let imageUrl;
-  console.log(data);
-  console.log(data.hasOwnProperty("imageUrl"));
+  let imageUrl, phone;
+
   if (data.imageUrl !== undefined) {
     imageUrl = data.imageUrl;
   } else {
     imageUrl = null;
   }
+  if (data.phone !== undefined) {
+    phone = data.phone;
+  } else {
+    phone = "";
+  }
   return NextResponse.json(
     {
       message: "Users get",
       imageUrl,
-      phone: data.phone || "",
+      phone,
     },
     { status: 201 }
   );

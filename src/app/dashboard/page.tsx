@@ -69,22 +69,24 @@ export default function Home() {
 
   const getUserData = async () => {
     try {
+      console.log(session?.user?.email);
+      const hola = session?.user?.email;
       const res = await fetch("api/check", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
-          email: session?.user?.email,
+          email: hola,
         }),
       });
       if (res.ok) {
         const data = await res.json();
         if (data.message === "Users get") {
-          console.log(data.imageUrl);
           if (data.imageUrl) {
             setimgURL(data.imageUrl);
           } else {
             setimgURL(session?.user?.image || "");
           }
+
           setPhone(data.phone);
         }
       }
@@ -129,6 +131,7 @@ export default function Home() {
 
   useEffect(() => {
     if (status !== "loading") {
+      /*console.log(session?.user?.email);*/
       getUserData();
     }
   }, [status]);
