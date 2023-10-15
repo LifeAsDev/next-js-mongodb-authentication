@@ -45,7 +45,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
-          name: session?.user?.name,
+          email: session?.user?.email,
           phone,
           imageUrl: url,
         }),
@@ -79,6 +79,7 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         if (data.message === "Users get") {
+          console.log(data.imageUrl);
           if (data.imageUrl) {
             setimgURL(data.imageUrl);
           } else {
@@ -144,7 +145,7 @@ export default function Home() {
           <div className="w-full pb-3 flex flex-row	gap-4 items-center 	border-b-[1px] border-gray-300 w-full">
             <UserIcon />
             <input
-              className="bg-transparent"
+              className="bg-transparent outline-none grow"
               type="text"
               disabled
               value={session?.user?.name ?? ""}

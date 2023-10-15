@@ -20,12 +20,20 @@ export async function POST(req: {
   let userExist;
 
   if (name) {
-    userExist = await User.findOne({ name }).select("name");
+    userExist = await User.findOne({
+      name: {
+        $regex: new RegExp(name || "", "i"),
+      },
+    }).select("name");
   } else {
     name = "";
   }
 
-  const userExist1 = await User.findOne({ email }).select("email");
+  const userExist1 = await User.findOne({
+    email: {
+      $regex: new RegExp(email || "", "i"),
+    },
+  }).select("email");
 
   console.log({ name, email, password });
 

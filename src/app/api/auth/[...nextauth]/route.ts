@@ -31,7 +31,7 @@ const handler = NextAuth({
       async authorize(credentials) {
         await connectMongoDB();
         const user =
-          credentials?.name !== ""
+          credentials?.name !== " "
             ? await User.findOne({
                 name: {
                   $regex: new RegExp(credentials?.name || "", "i"),
@@ -44,7 +44,7 @@ const handler = NextAuth({
           throw new Error("Invalid Username");
         }
         if (
-          user.password !== "" &&
+          user.password !== " " &&
           (await compare(credentials!.password, user.password))
         ) {
           console.log("sesion iniciada");
@@ -59,33 +59,50 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
-        await connectMongoDB();
         const { email } = user;
-        const userExist = await User.findOne({ email });
 
-        if (!userExist) {
-          try {
-            const res = await fetch("http://localhost:3000/api/register", {
-              method: "POST",
-              headers: { "Content-type": "application/json" },
-              body: JSON.stringify({ email }),
-            });
-            if (res.ok) {
-              return user;
-            }
-          } catch (error) {
-            console.log(error);
+        await connectMongoDB();
+
+        console.log("userCreated");
+
+        const userExist1 = await User.findOne({
+          email: {
+            $regex: new RegExp(email || "", "i"),
+          },
+        }).select("email name");
+
+        if (userExist1) {
+          if (userExist1.name === " ") {
+            return user;
           }
-        } else if (userExist.name !== "") {
+
           return false;
+        } else {
+          User.create({
+            name: " ",
+            email,
+            password: " ",
+          });
+          return user;
         }
-        console.log(userExist.name);
+      } else {
+        return user;
       }
-      return user;
     },
   },
   pages: {
     signIn: "/",
+  },
+  cookies: {
+    pkceCodeVerifier: {
+      name: "next-auth.pkce.code_verifier",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
   },
   session: {
     strategy: "jwt",

@@ -7,13 +7,17 @@ import mongoose from "mongoose";
 
 export async function POST(req: {
   json: () =>
-    | PromiseLike<{ phone: any; imageUrl: any; name: any }>
-    | { phone: any; imageUrl: any; name: any };
+    | PromiseLike<{ phone: any; imageUrl: any; email: any }>
+    | { phone: any; imageUrl: any; email: any };
 }) {
-  const { phone, imageUrl, name } = await req.json();
+  const { phone, imageUrl, email } = await req.json();
   await connectMongoDB();
   const data = await User.findOneAndUpdate(
-    { name },
+    {
+      email: {
+        $regex: new RegExp(email || "", "i"),
+      },
+    },
     { phone, imageUrl },
     { new: true }
   );

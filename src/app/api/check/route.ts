@@ -11,7 +11,9 @@ export async function POST(req: {
   await connectMongoDB();
   const data = await User.findOne({ email });
   let imageUrl;
-  if (data.hasOwnProperty("imageUrl")) {
+  console.log(data);
+  console.log(data.hasOwnProperty("imageUrl"));
+  if (data.imageUrl !== undefined) {
     imageUrl = data.imageUrl;
   } else {
     imageUrl = null;
