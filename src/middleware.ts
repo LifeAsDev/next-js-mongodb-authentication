@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function middleware(req: any) {
   const auth = req.nextUrl.clone();
-  auth.pathname = "/sign-up";
+  auth.pathname = "/";
   const afterAuth = req.nextUrl.clone();
   afterAuth.pathname = "/dashboard";
 

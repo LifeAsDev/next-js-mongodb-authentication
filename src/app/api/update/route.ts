@@ -11,15 +11,12 @@ export async function POST(req: {
     | { phone: any; imageUrl: any; name: any };
 }) {
   const { phone, imageUrl, name } = await req.json();
-
   await connectMongoDB();
-  console.log({ phone, imageUrl, name });
   const data = await User.findOneAndUpdate(
     { name },
     { phone, imageUrl },
     { new: true }
   );
-  console.log(data);
   return NextResponse.json(
     { message: "Users update", imageUrl },
     { status: 201 }

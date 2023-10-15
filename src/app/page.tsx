@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
+import GoogleButton from "./components/GoogleButton";
 export default function Home() {
   const router = useRouter();
 
@@ -52,12 +53,15 @@ export default function Home() {
     }
   };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
-      <h2 className="text-[2rem]	font-extrabold	">Welcome</h2>
+    <main className="flex min-h-screen flex-col items-center justify-center ">
+      <h2 className="text-[2rem]	font-extrabold	mb-6">Welcome</h2>
+
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-0.5 min-w-[25rem]"
       >
+        <GoogleButton />
+
         <input
           onBlur={() => setErrors([])}
           value={name}
@@ -106,13 +110,13 @@ export default function Home() {
         </p>
         <button
           disabled={loading}
-          className={`flex justify-center items-center shadow-e box-border mt-3 h-[52px] text-white rounded-[50px] bg-green p-[.5rem] ${
+          className={`flex justify-center items-center shadow-e box-border  h-[52px] text-white rounded-[50px] bg-green p-[.5rem] ${
             loading ? "saturate-50" : ""
           }`}
         >
           {!loading ? "LOGIN" : <div className="loader"></div>}
         </button>
-        <Link className="mt-10" href={"/sign-up"}>
+        <Link className="mt-5" href={"/sign-up"}>
           Don't have an account? <span className="text-green">Sign up</span>
         </Link>
       </form>

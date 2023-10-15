@@ -73,13 +73,17 @@ export default function Home() {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
-          name: session?.user?.name,
+          email: session?.user?.email,
         }),
       });
       if (res.ok) {
         const data = await res.json();
         if (data.message === "Users get") {
-          setimgURL(data.imageUrl);
+          if (data.imageUrl) {
+            setimgURL(data.imageUrl);
+          } else {
+            setimgURL(session?.user?.image || "");
+          }
           setPhone(data.phone);
         }
       }
@@ -123,7 +127,9 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    status !== "loading" ? getUserData() : null;
+    if (status !== "loading") {
+      getUserData();
+    }
   }, [status]);
 
   if (status === "loading") {
@@ -210,6 +216,7 @@ export default function Home() {
                 {loadingImg > 99 ? "SAVE" : <div className="loader"></div>}
               </button>
               <button
+                type="button"
                 onClick={() => signOut()}
                 className={`w-[30%] outline-none flex justify-center items-center shadow-red box-border mt-3 h-[48px] text-white rounded-[50px] bg-red-500 p-[.5rem]`}
               >

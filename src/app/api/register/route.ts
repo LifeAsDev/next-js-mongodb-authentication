@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { connectMongoDB } from "../../lib/mongodb";
 import User from "../../models/user";
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
 
 export async function POST(req: {
   json():
@@ -12,14 +11,23 @@ export async function POST(req: {
   method: string;
   body: { name: any; email: any; password: any };
 }) {
-  const { name, email, password } = await req.json();
-
+  let { name, email, password } = await req.json();
+  let hashedPassword = "";
   await connectMongoDB();
+  if (password) {
+    hashedPassword = await bcrypt.hash(password, 10);
+  }
+  let userExist;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  if (name) {
+    userExist = await User.findOne({ name }).select("name");
+  } else {
+    name = "";
+  }
 
-  const userExist = await User.findOne({ name }).select("name");
   const userExist1 = await User.findOne({ email }).select("email");
+
+  console.log({ name, email, password });
 
   if (userExist || userExist1) {
     console.log("user existed");

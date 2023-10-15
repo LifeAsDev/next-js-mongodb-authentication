@@ -4,21 +4,24 @@ import { connectMongoDB } from "../../lib/mongodb";
 import User from "../../models/user";
 
 export async function POST(req: {
-  json: () =>
-    | PromiseLike<{ phone: any; imageUrl: any; name: any }>
-    | { phone: any; imageUrl: any; name: any };
+  json: () => PromiseLike<{ email: any }> | { email: any };
 }) {
-  const { name } = await req.json();
+  const { email } = await req.json();
 
   await connectMongoDB();
-  const data = await User.findOne({ name });
-  console.log({
-    message: "Users get",
-    imageUrl: data.imageUrl,
-    phone: data.phone,
-  });
+  const data = await User.findOne({ email });
+  let imageUrl;
+  if (data.hasOwnProperty("imageUrl")) {
+    imageUrl = data.imageUrl;
+  } else {
+    imageUrl = null;
+  }
   return NextResponse.json(
-    { message: "Users get", imageUrl: data.imageUrl, phone: data.phone },
+    {
+      message: "Users get",
+      imageUrl,
+      phone: data.phone || "",
+    },
     { status: 201 }
   );
 }

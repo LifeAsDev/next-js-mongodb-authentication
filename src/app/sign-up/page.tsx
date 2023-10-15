@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import GoogleButton from "../components/GoogleButton";
 
 export default function Home() {
   const [name, setName] = useState("");
@@ -56,12 +57,14 @@ export default function Home() {
     }
   };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 gap-8">
-      <h2 className="text-[2rem]	font-extrabold	">Register</h2>
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <h2 className="text-[2rem]	font-extrabold	mb-6">Register</h2>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-0.5 min-w-[25rem]"
       >
+        <GoogleButton />
+
         <input
           onBlur={() => setErrors([])}
           value={name}
@@ -78,7 +81,7 @@ export default function Home() {
           type="text"
           placeholder="Username"
         ></input>
-        <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
+        <p className="min-h-[2rem] text-red-500 font-medium text-end">
           {errors.includes("name required")
             ? "Field required"
             : errors.includes("Username already in use")
@@ -102,7 +105,7 @@ export default function Home() {
           type="text"
           placeholder="Email"
         ></input>
-        <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
+        <p className="min-h-[2rem] text-red-500 font-medium text-end">
           {errors.includes("email required")
             ? "Field required"
             : errors.includes("email invalid")
@@ -124,12 +127,12 @@ export default function Home() {
           type="password"
           placeholder="Password"
         ></input>
-        <p className="min-h-[2.5rem] text-red-500 font-medium text-end">
+        <p className="min-h-[2rem] text-red-500 font-medium text-end">
           {errors.includes("pass required") ? "Field required" : null}
         </p>
         <button
           disabled={loading}
-          className={`flex justify-center items-center shadow-e box-border mt-3 h-[52px] text-white rounded-[50px] bg-green p-[.5rem] ${
+          className={`flex justify-center items-center shadow-e box-border h-[52px] mt-4  text-white rounded-[50px] bg-green p-[.5rem] ${
             loading ? "saturate-50" : ""
           }`}
         >

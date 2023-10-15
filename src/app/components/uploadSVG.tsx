@@ -1,7 +1,7 @@
 const Icon = () => {
   return (
     <svg
-      className="fill-blue	text-[2rem]"
+      className="fill-blue-300	text-[2rem]"
       xmlns="http://www.w3.org/2000/svg"
       height="1em"
       viewBox="0 0 640 512"
