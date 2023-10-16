@@ -117,7 +117,8 @@ export default function Home() {
           {!loading ? "LOGIN" : <div className="loader"></div>}
         </button>
         <Link className="mt-5" href={"/sign-up"}>
-          Don't have an account? <span className="text-green">Sign up</span>
+          Don&apos;t have an account?
+          <span className="text-green">Sign up</span>
         </Link>
       </form>
     </main>
