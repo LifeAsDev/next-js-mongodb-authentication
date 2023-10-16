@@ -7,6 +7,7 @@ import UserIcon from "../components/userSVG";
 import PhoneIcon from "../components/phoneSVG";
 import UploadIcon from "../components/uploadSVG";
 import DeleteIcon from "../components/deleteSVG";
+import Image from "next/image";
 
 export default function Home() {
   const [phone, setPhone] = useState("");
@@ -171,10 +172,12 @@ export default function Home() {
             {imgURL !== "" ? (
               <div className="flex flex-col justify-center items-center border-dotted border-2 w-full min-h-[300px] ">
                 <div className="relative h-full">
-                  <img
+                  <Image
                     className="w-full h-full object-cover"
                     src={imgURL}
-                    alt="Thumb"
+                    alt="Preview image"
+                    width={500} // Agrega el ancho de la imagen
+                    height={300} // Agrega la altura de la imagen
                   />
                 </div>
                 <div className="relative w-full">
