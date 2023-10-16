@@ -4,6 +4,7 @@ import { connectMongoDB } from "../../../lib/mongodb";
 import User from "../../../models/user";
 import { compare } from "bcrypt";
 import GoogleProvider from "next-auth/providers/google";
+
 const handler = NextAuth({
   providers: [
     GoogleProvider({
@@ -40,8 +41,6 @@ const handler = NextAuth({
           console.log("Invalid Username");
           throw new Error("Invalid Username");
         }
-        console.log(credentials?.email);
-        console.log(user);
 
         if (
           user.password !== " " &&
