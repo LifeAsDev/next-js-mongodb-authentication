@@ -5,11 +5,7 @@ import User from "../../models/user";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
-export async function POST(req: {
-  json: () =>
-    | PromiseLike<{ phone: any; imageUrl: any; email: any }>
-    | { phone: any; imageUrl: any; email: any };
-}) {
+export async function POST(req: Request) {
   const { phone, imageUrl, email } = await req.json();
   await connectMongoDB();
   const data = await User.findOneAndUpdate(

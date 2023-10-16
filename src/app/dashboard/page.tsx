@@ -68,34 +68,6 @@ export default function Home() {
     }
   };
 
-  const getUserData = async () => {
-    try {
-      console.log(session?.user?.email);
-      const hola = session?.user?.email;
-      const res = await fetch("api/check", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify({
-          email: hola,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.message === "Users get") {
-          if (data.imageUrl) {
-            setimgURL(data.imageUrl);
-          } else {
-            setimgURL(session?.user?.image || "");
-          }
-
-          setPhone(data.phone);
-        }
-      }
-    } catch (error) {
-      console.log("error");
-    }
-  };
-
   const handleUpload = (e: { [x: string]: any; preventDefault: any }) => {
     setLoadingImg(0);
     console.log("uploading to firebase boss");
@@ -131,11 +103,36 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const email = session?.user?.email;
+        console.log(email);
+
+        const res = await fetch("api/check", {
+          method: "POST",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify({
+            email,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.message === "Users get") {
+            const imageUrl = data.imageUrl || session?.user?.image || "";
+            setimgURL(imageUrl);
+            setPhone(data.phone);
+          }
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
     if (status !== "loading") {
-      /*console.log(session?.user?.email);*/
       getUserData();
     }
-  }, [status]);
+  }, [status, session]);
 
   if (status === "loading") {
     return <p> </p>;

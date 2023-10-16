@@ -4,13 +4,7 @@ import { connectMongoDB } from "../../lib/mongodb";
 import User from "../../models/user";
 import bcrypt from "bcrypt";
 
-export async function POST(req: {
-  json():
-    | { name: any; email: any; password: any }
-    | PromiseLike<{ name: any; email: any; password: any }>;
-  method: string;
-  body: { name: any; email: any; password: any };
-}) {
+export async function POST(req: Request) {
   let { name, email, password } = await req.json();
   let hashedPassword = "";
   await connectMongoDB();

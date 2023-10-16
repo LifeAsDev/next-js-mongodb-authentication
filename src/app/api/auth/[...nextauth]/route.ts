@@ -6,6 +6,41 @@ import { compare } from "bcrypt";
 import GoogleProvider from "next-auth/providers/google";
 
 const handler = NextAuth({
+  callbacks: {
+    async signIn({ user, account }) {
+      console.log(account?.provider);
+      if (account?.provider === "google") {
+        const { email } = user;
+
+        await connectMongoDB();
+
+        console.log("userCreated");
+
+        const userExist1 = await User.findOne({
+          email: {
+            $regex: new RegExp(email || "", "i"),
+          },
+        }).select("email name");
+
+        if (userExist1) {
+          if (userExist1.name === " ") {
+            return true;
+          }
+
+          return false;
+        } else {
+          User.create({
+            name: " ",
+            email,
+            password: " ",
+          });
+          return true;
+        }
+      } else {
+        return true;
+      }
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -55,41 +90,7 @@ const handler = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async signIn({ user, account }) {
-      console.log(account?.provider);
-      if (account?.provider === "google") {
-        const { email } = user;
 
-        await connectMongoDB();
-
-        console.log("userCreated");
-
-        const userExist1 = await User.findOne({
-          email: {
-            $regex: new RegExp(email || "", "i"),
-          },
-        }).select("email name");
-
-        if (userExist1) {
-          if (userExist1.name === " ") {
-            return user;
-          }
-
-          return false;
-        } else {
-          User.create({
-            name: " ",
-            email,
-            password: " ",
-          });
-          return user;
-        }
-      } else {
-        return user;
-      }
-    },
-  },
   pages: {
     signIn: "/",
   },
